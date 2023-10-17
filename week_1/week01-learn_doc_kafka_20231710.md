@@ -13,7 +13,8 @@ Dokumentasi ini berisi langkah-langkah yang saya pelajari saat belajar tentang A
 `bin/zookeeper-server-start.sh config/zookeeper.properties`
 Pada bagian ini, zookeeper akan running di terminal, tentu hal ini akan tidak efisien karena jika terminal tersebut ditutup maka zookeeper servicenya pun berakhir.
 
--pic zookeeper without systemd-
+![zookeper_start_without_persistent](https://github.com/adtyap26/learning-kafka/assets/101618848/6e881640-33af-4469-bc97-3d4fdf67faed)
+
 
 - Untuk menyelesaikan masalah tersebut terdapat berbagai cara untuk membuat terminal yang sedang running sebuah process tadi tetap persistent atau bisa running sebagai background process, diantanya:
 
@@ -94,7 +95,8 @@ Selanjutnya dengan perintah `sudo systemctl enable --now kafka.service`
 
 2.1. Periksa status Kafka cluster dengan perintah `systemctl status kafka`.
 
--pic systemctl status kafka-
+![kafka_service_status](https://github.com/adtyap26/learning-kafka/assets/101618848/d40b11b1-e8b5-4eb0-9265-05756eaeeb54)
+
 
 ## 2. Buat Topic, Test Produce Data, dan Consume Data Menggunakan CLI
 
@@ -115,13 +117,16 @@ exec $(dirname $0)/kafka-run-class.sh kafka.tools.ConsoleProducer "$@"
 
 bisa kita lihat script ini hanya mengeksekusi sebuah script lainnya yaitu `kafka-run-class.sh` yang terhubung ke library di didalam direktori lain (dalam hal ini `/lib/kafka-tools-3.6.0.jar`)
 
--pic kafkatool-
+![kafka_tools](https://github.com/adtyap26/learning-kafka/assets/101618848/5a397249-b165-4ddf-b388-f8939b4b3fd4)
+
+
 
 Beragam opsi lain dari command `kafka-topics.sh` dapat kita lakukan seperti menambah jumlah partisi, replikasi dan portnya dsb `~/Apps/kafka/kafka_2.13-3.6.0/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic latest-topic`
 
 1.2. Untuk melihat topic yang telah kita buat, kita dapat menggunakan perintah `bin/kafka-topics.sh --describe --topic quickstart-events --bootstrap-server localhost:9092`
 
--pic describe kafkatopic-
+![describe_topic](https://github.com/adtyap26/learning-kafka/assets/101618848/6c62db56-1be7-4d25-8567-8b4d7371ae4b)
+
 
 ### Langkah 2: Produksi Data Ke dalam topic
 
@@ -131,13 +136,17 @@ Sekali lagi semua "heavy lifting" sudah dibuat oleh kafka, inti dari `kafka-cons
 
 Ketika kita running perintah tadi maka akan muncul teks yang bisa kita tulis sebagai sebuah pesan atau event yang akan disimpan oleh kafka
 
--pic event kafka-
+![create_event](https://github.com/adtyap26/learning-kafka/assets/101618848/c9f4e3a6-dc04-4253-8186-59464fb81a1d)
+
+
 
 **Note**
 
 Saya juga baru menyadari, kalau kafka tidak punya web interface, ketika kita buka di localhost:9092 via browser. Tapi kita dapat melakukan inpeksi dengan `netcat` `nc -vz localhost 9092`. Munkin disinilah peran dari [confluent](https://www.confluent.io/)
 
--pic netstat-
+![netcat9092](https://github.com/adtyap26/learning-kafka/assets/101618848/242f4e20-e0d5-463f-b4bf-230e9bf12d90)
+
+
 
 ### Langkah 3: Konsumsi Data
 
@@ -147,7 +156,9 @@ Mungkin tujuannya agar kita jadi lebih memahami bagaiman proses produce and cons
 
 3.2. Verifikasi bahwa saya dapat melihat pesan yang telah saya produksi.
 
--pic produce and consume-
+![produce_and_consume](https://github.com/adtyap26/learning-kafka/assets/101618848/bc8dd66b-9343-4717-8250-491ba6f2f6e8)
+
+
 
 ## 3. Lakukan Pengecekan ZooKeeper Quorum dan Kafka Cluster ID
 
@@ -163,12 +174,17 @@ Dari beragam sumber di internet terdapat rumus dasar seperti `Majority rule: QN 
 
 Untuk melakukan pengecekannya saya masih perlu waktu untuk belajar terkait hal ini namun saya menemukan perintah `./kafka-metadata-quorum.sh --bootstrap-server localhost:9092 describe --status` dimana jika dilihat dari situs doc kafka sepertinya hanya running untuk kRaft mode.
 
-sebab, command tersebut saya jalankan hasilnya seperti ini.
+sebab, command tersebut saya jalankan hasilnya seperti ini:
+
+![quorum_unssuport](https://github.com/adtyap26/learning-kafka/assets/101618848/6d9be63e-a24f-4881-a890-dd9170e9cb37)
+
+
 
 ### Langkah 2: Pengecekan Kafka Cluster ID
 
 2.1. Untuk mengecek Cluster ID, yang saya lakukan adalah melihat log dengan file yang berisi `meta.properties`
 
--pic metaprop-
+![cat_metaprop](https://github.com/adtyap26/learning-kafka/assets/101618848/af42c026-a377-4a6b-bfd8-0e9cb45d5494)
+
 
 Dengan langkah-langkah ini, saya telah berhasil memahami dasar-dasar Apache Kafka, termasuk deploy Kafka cluster dan running lewat systemd, membuat topic, serta meng-produce dan meng-consume data. Selain itu, saya juga dapat memastikan keberhasilan cluster ZooKeeper dan mendapatkan informasi tentang Kafka cluster ID.
