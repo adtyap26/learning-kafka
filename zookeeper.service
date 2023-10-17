@@ -1,0 +1,16 @@
+[Unit]
+Description=Apache zookeeper
+Documentation=https://zookeeper.apache.org/
+Requires=network.target remote-fs.target
+After=network.target remote-fs.target
+
+[Service]
+Type=simple
+User=permaditya
+ExecStart=/home/permaditya/Apps/kafka/kafka_2.13-3.6.0/bin/zookeeper-server-start.sh /home/permaditya/Apps/kafka/kafka_2.13-3.6.0/config/zookeeper.properties
+ExecStop=/home/permaditya/Apps/kafka/kafka_2.13-3.6.0/bin/zookeeper-server-stop.sh
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target
+

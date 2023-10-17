@@ -1,0 +1,15 @@
+[Unit]
+Description=kafka server
+Requires=zookeeper.service
+After=zookeeper.service
+
+[Service]
+Type=simple
+User=permaditya
+WorkingDirectory=/home/permaditya/Apps/kafka/kafka_2.13-3.6.0/bin/
+ExecStart=/bin/sh -c '/home/permaditya/Apps/kafka/kafka_2.13-3.6.0/bin/kafka-server-start.sh /home/permaditya/Apps/kafka/kafka_2.13-3.6.0/config/server.properties > /home/permaditya/Database/server/kafka/kafka.log 2>&1'
+ExecStop=/home/permaditya/Apps/kafka/kafka_2.13-3.6.0/bin/kafka-server-stop.sh
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target
