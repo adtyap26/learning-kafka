@@ -17,12 +17,12 @@ Pada posisi ini config `server.properties` nya menggunakan `listeners=PLAINTEXT:
 Sedang dalam konfigurasi wiresharknya saya memastikan bahwa protocol kafka terpasang di dalam `edit => preferences => Protocols`. Setelah itu kita akan melakukan paket capture menggunakan interface `Loopback:lo` untuk sniffing paket localhost.
 
 Berikut adalah hasil dari sniffingnya:
+![wiresharkoverview](https://github.com/adtyap26/learning-kafka/assets/101618848/2a63370e-948c-4fbe-aa41-eeaee0c64d34)
 
---Pic wireshark--
 
 Jika kita melakukan follow dan tcp stream pada salah satu pake data tersebut maka hasilnya sebagai berikut:
+![sniff_wireshark](https://github.com/adtyap26/learning-kafka/assets/101618848/6bd624a0-d1d0-46ce-8da9-23f8b41eaf2a)
 
---pic sniff wireshark--
 
 Dapat kita lihat, gambar sebelah kiri adalah sebuah client yang melakukan produce data, sedang gambar sebelah kanan wireshark dapat melihat pesan yang ditransfer dari producer tersebut.
 
@@ -163,7 +163,8 @@ ssl.clientAuth=need
 ```
 
 Jika kita run atau restart service dari zookeeper dan tidak ada masalah, maka, servernya sudah berjalan dengan baik. Selanjutnya kita akan membuat konfigurasi untuk klient dari zookeeper seperti `zookeeper-shell` kita bisa membuat filenya bernama `zookeeper-client.properties`.
---pic zookeeper-server-ssl--
+![zookeeper-server-ssl](https://github.com/adtyap26/learning-kafka/assets/101618848/25a8bdf1-b704-4da2-89b6-91b2032afe2d)
+
 
 ## 2. Mengaplikasikan Keamanan Untuk Zookeeper Client dan Melakukan Koneksi Dengan Menggunakan Enkripsi dan Autentikasi.
 
@@ -211,8 +212,8 @@ zookeeper.ssl.keystore.password=latihan
 Sekarang untuk melihat apakah secure connection yang telah kita buat berjalan di zookeeper-client dapat kita gunakan command berikut ` bin/zookeeper-shell.sh localhost:2181 -zk-tls-config-file config/zookeeper-client.properties`
 
 hasilnya seperti ini:
+![zookeeper-client-ssl](https://github.com/adtyap26/learning-kafka/assets/101618848/9bc64e91-3723-4d86-977b-5d50e5bec50f)
 
---pic zookeeper-client-ssl--
 
 ## 3. Mengaplikasikan Keamanan Untuk Kafka Inter Broker
 
@@ -263,9 +264,10 @@ zookeeper.set.acl=true
 ```
 
 Untuk membuktikan configurasi yang kita buat berjalan kita akan running `kafka-server-start.sh -daemon config/server.properties`
+![kafka-server-start-ssl](https://github.com/adtyap26/learning-kafka/assets/101618848/573a03a5-0cc3-45b5-b89d-4e4d92810fda)
 
---pic kafka server start---
--- zookeeper shell ls brokers ---
+![ls-broker0](https://github.com/adtyap26/learning-kafka/assets/101618848/7e24b54d-510a-4333-b366-0dca1db7c07c)
+
 
 ### 3.2 Kafka Broker Sebagai Server
 
@@ -335,8 +337,9 @@ ssl.client.auth=required
 ```
 
 Jika berhasil dijalankan lewat `bin/kafka-server-start.sh` maka hasilnya akan seperti ini:
+![kafka-broker-ssl-start](https://github.com/adtyap26/learning-kafka/assets/101618848/d344fcfc-a6f2-47db-9d76-8348560ae13e)
 
---pic interbroker ssl --
+
 
 ## 4. Mengaplikasikan Keamanan Untuk Kafka Client
 
@@ -394,8 +397,9 @@ ssl.truststore.type=PKCS12
 Jika semuanya berjalan dengan lancar kita dapat memeriksa apakah ketika kita membuat sebuah topik dan membuat pesan dari topik tersebut wireshark masih dapat melakukan sniffing atau tidak.
 
 berikut hasilnya jika config kita berhasil:
+![securedataproduce](https://github.com/adtyap26/learning-kafka/assets/101618848/04efdd6b-d427-4518-a55d-04b344ebca60)
 
---wireshark cant sniff--
+
 
 ## 5. Menjalankan ACL (Access Control List)
 
@@ -445,14 +449,17 @@ listener.name.sasl_ssl.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.se
 
 Namun sepertinya terdapat kesalahan configurasi yang saya lakukan, atau kekeliruan yang saya belum bisa mengerti penyebabnya kenapa. Karena ketika saya running kafka brokernya terdapat error `org.apache.zookeeper.KeeperException$NoAuthException: KeeperErrorCode = NoAuth for /config/users/kafka-admin`
 
---kafka-start-error-
+
+![error_kafkastart](https://github.com/adtyap26/learning-kafka/assets/101618848/76f1ac4f-66f6-4d08-9d08-30b901eb9c2f)
+
 
 Dari pencarian ke dokumentasi resmi dan beberapa forum termasuk diskusi internal dengan teman, ada dua cara untuk menyelesaikannya. Pertama di dalam `zookeeper.properties` kita dapat menambahkan `skipACL=yes`. Keterangan dari hal ini masih belum sepenuhnya saya pahami. Apa yang sebenarnya terjadi di belakang layar ketika perintah tersebut dijalankan. Namun jika di lihat dari source code zookeepernya sendiri sepertinya perintah tersebut tidak akan melakukan proses checking terdapat ACL.
 --pic source-code acl--
 
 Hasinya ketika `kafka-server-start.sh`:
+![kafka-start-after-skipacl](https://github.com/adtyap26/learning-kafka/assets/101618848/2250098e-9281-4802-9971-39dda6635f96)
 
---pic_SASL_KAFKA_SERVER_afer acl--
+
 
 Cara kedua sepertinya lebih rumit lagi, karena saya memang belum ada pengalaman melakukan konfigurasi berbasis env java. Dimana dalam cara kedua kita mencoba membuat super user dan memasukkannya langsung ke dalam zookeeper. Sehingga kita dapat melakukan perubahan lewat admin privileges. Berikut linknya [zookeeper doc](https://zookeeper.apache.org/doc/r3.5.3-beta/zookeeperAdmin.html#sc_authOptions) atau artikel di medium [Overcoming Zookeeper ACLs](https://medium.com/@johny.urgiles/overcoming-zookeeper-acls-1b205cfdc301).
 
