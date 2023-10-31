@@ -513,6 +513,6 @@ Hasil dari write dan read menggunakan `SASL_SSL`:
 
 - Source
 
-[Kafka: The Definitive Guide, 2nd Edition](https://www.oreilly.com/library/view/kafka-the-definitive/9781492043072/)
-[Kafka Security Overview](https://kafka.apache.org/documentation/#security_overview)
-[Data Engineering Mind Github](https://github.com/vinclv/data-engineering-minds-kafka/)
+1. [Kafka: The Definitive Guide, 2nd Edition](https://www.oreilly.com/library/view/kafka-the-definitive/9781492043072/)
+2. [Kafka Security Overview](https://kafka.apache.org/documentation/#security_overview)
+3. [Data Engineering Mind Github](https://github.com/vinclv/data-engineering-minds-kafka/)
