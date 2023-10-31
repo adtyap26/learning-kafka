@@ -17,12 +17,12 @@ Pada posisi ini config `server.properties` nya menggunakan `listeners=PLAINTEXT:
 Sedang dalam konfigurasi wiresharknya saya memastikan bahwa protocol kafka terpasang di dalam `edit => preferences => Protocols`. Setelah itu kita akan melakukan paket capture menggunakan interface `Loopback:lo` untuk sniffing paket localhost.
 
 Berikut adalah hasil dari sniffingnya:
+
 ![wiresharkoverview](https://github.com/adtyap26/learning-kafka/assets/101618848/2a63370e-948c-4fbe-aa41-eeaee0c64d34)
 
-
 Jika kita melakukan follow dan tcp stream pada salah satu pake data tersebut maka hasilnya sebagai berikut:
-![sniff_wireshark](https://github.com/adtyap26/learning-kafka/assets/101618848/6bd624a0-d1d0-46ce-8da9-23f8b41eaf2a)
 
+![sniff_wireshark](https://github.com/adtyap26/learning-kafka/assets/101618848/6bd624a0-d1d0-46ce-8da9-23f8b41eaf2a)
 
 Dapat kita lihat, gambar sebelah kiri adalah sebuah client yang melakukan produce data, sedang gambar sebelah kanan wireshark dapat melihat pesan yang ditransfer dari producer tersebut.
 
@@ -35,9 +35,9 @@ Kafka memiliki solusi terhadap permasalahan tersebut dengan memiliki bebrapa ops
 | 3   | SASL_PLAINTEXT | Autentikasi tanpa menggunakan enkripsi           |
 | 4   | SASL_SSL       | Autentikasi dengan menggunakan enkripsi SSL/TLS. |
 
-Hal ini berarti apabila pada bagian listerner kita ubah menggunakan SSL atau SASL, maka data dipastikan terenkripsi dan terautensifikasi dengan baik dan tidak dapat disniff menggunakan wireshark.
+Hal ini berarti apabila pada bagian listerner kita ubah menggunakan SSL atau SASL, maka data dipastikan terenkripsi dan terautensifikasi dengan baik dan tidak akan dapat disniff menggunakan wireshark.
 
-Untuk SSl, kita membutuhkan certificate yang menunjukkan kalau sistem kita telah mendapatkan sebuah otoritas untuk melakukan sebuah hubungan dengan perangkat atau sistem uang lain, maka kita perlu membuat sebuah "legal formalnya", berikut penjelasan singkatnya:
+Untuk SSl, kita membutuhkan certificate yang menunjukkan kalau sistem kita telah mendapatkan sebuah otoritas untuk melakukan sebuah hubungan dengan perangkat atau sistem yang lain, maka kita perlu membuat sebuah "legal formalnya", berikut penjelasan singkatnya:
 
 Kita akan membuat sebuah dokumen resmi (certificate) untuk Zookeeper kepada clientya yakni Kafka broker, serta Kafka broker kepada clientnya yakni producer dan consumer apps dengan memberikannya sebuah tanda-tangan jaminan (certificate authority) menggunakan `openssl` untuk menunjukkan bahwa certificate dari zookeeper serta kafka brokernya otentik.
 
@@ -163,8 +163,8 @@ ssl.clientAuth=need
 ```
 
 Jika kita run atau restart service dari zookeeper dan tidak ada masalah, maka, servernya sudah berjalan dengan baik. Selanjutnya kita akan membuat konfigurasi untuk klient dari zookeeper seperti `zookeeper-shell` kita bisa membuat filenya bernama `zookeeper-client.properties`.
-![zookeeper-server-ssl](https://github.com/adtyap26/learning-kafka/assets/101618848/25a8bdf1-b704-4da2-89b6-91b2032afe2d)
 
+![zookeeper-server-ssl](https://github.com/adtyap26/learning-kafka/assets/101618848/25a8bdf1-b704-4da2-89b6-91b2032afe2d)
 
 ## 2. Mengaplikasikan Keamanan Untuk Zookeeper Client dan Melakukan Koneksi Dengan Menggunakan Enkripsi dan Autentikasi.
 
@@ -211,13 +211,13 @@ zookeeper.ssl.keystore.password=latihan
 
 Sekarang untuk melihat apakah secure connection yang telah kita buat berjalan di zookeeper-client dapat kita gunakan command berikut ` bin/zookeeper-shell.sh localhost:2181 -zk-tls-config-file config/zookeeper-client.properties`
 
-hasilnya seperti ini:
-![zookeeper-client-ssl](https://github.com/adtyap26/learning-kafka/assets/101618848/9bc64e91-3723-4d86-977b-5d50e5bec50f)
+Hasilnya seperti ini:
 
+![zookeeper-client-ssl](https://github.com/adtyap26/learning-kafka/assets/101618848/9bc64e91-3723-4d86-977b-5d50e5bec50f)
 
 ## 3. Mengaplikasikan Keamanan Untuk Kafka Inter Broker
 
-Untuk membuat security pada kafka inter broker yang artinya mengamankan server kafka. Baik saat dia berfungsi sebagai "client" terhadap zoojeeper atau juga saat berfungsi sebagai "server" terhadap producer apps dan consumer apps.
+Untuk membuat security pada kafka inter broker yang artinya mengamankan server kafka. Baik saat dia berfungsi sebagai "client" terhadap zookeeper atau juga saat berfungsi sebagai "server" terhadap producer apps dan consumer apps.
 
 ### 3.1 Kafka-broker sebagai client dari Zookeeper
 
@@ -244,7 +244,7 @@ keytool -keystore kafka.broker.keystore.jks -alias kafka-broker -import -file ca
 
 ```
 
-Sekarang kita perlu menambahkan juga SSL settings pada `server.properties`. Karena kafka-broker bertindak sebagai client terhadap zookeeper, maka bentuk configurasinya pun tidak berbeda dangan zookeeper client lainnya yang sebelumnya kita buat. Tinggal dipenambahan `zookeeper.set.acl=true` pada config tersebur. Access control lists (ACLs) merupakan salah satu fitur keamana yang berfungsi seperti file permission di linux. Lebih jauh terkait ini akan kita bahas pada bagian akhir.
+Sekarang kita perlu menambahkan juga SSL settings pada `server.properties`. Karena kafka-broker bertindak sebagai client terhadap zookeeper, maka bentuk configurasinya pun tidak berbeda dangan zookeeper client lainnya yang sebelumnya kita buat. Tinggal dipenambahan `zookeeper.set.acl=true` pada config tersebur. Access control lists (ACLs) merupakan salah satu fitur keamanan yang berfungsi seperti file permission di linux. Lebih jauh terkait hal ini akan kita bahas pada bagian akhir.
 
 ```bash
 
@@ -264,14 +264,17 @@ zookeeper.set.acl=true
 ```
 
 Untuk membuktikan configurasi yang kita buat berjalan kita akan running `kafka-server-start.sh -daemon config/server.properties`
+
 ![kafka-server-start-ssl](https://github.com/adtyap26/learning-kafka/assets/101618848/573a03a5-0cc3-45b5-b89d-4e4d92810fda)
 
 ![ls-broker0](https://github.com/adtyap26/learning-kafka/assets/101618848/7e24b54d-510a-4333-b366-0dca1db7c07c)
 
-
 ### 3.2 Kafka Broker Sebagai Server
 
 Untuk membuat konfigurasi SSL di Kafka yang kali ini bertindak sebagai server maka saya akan mencoba dengan cara yang sedikit berbeda dari sebelumnya yang masih menggunakan `openssl` untuk membuat CA. Kali ini saya akan mengikuti tutorial dari buku Kafka: The Definitive Guide, 2nd Edition.
+
+**Note**
+Terdapat sebuah error yang cukup mengganggu yakni `NoAuth for /config/users/kafka-admin` yang belum secara pasti diketahui penyebabnya. Namun ketika saya menggunakan certificate authority yang sama dengan saat saya membuat keamanan zookeeper. Error ini pun hilang. Jadi intruksi bisa skip pembuatan CA key yang baru seperti di bawah ini jika terdapat error yang sama. Lebih jelas terkai error ini akan dibahas pada bagian 5 menjalankan ACL.
 
 ```bash
 
@@ -339,8 +342,6 @@ ssl.client.auth=required
 Jika berhasil dijalankan lewat `bin/kafka-server-start.sh` maka hasilnya akan seperti ini:
 ![kafka-broker-ssl-start](https://github.com/adtyap26/learning-kafka/assets/101618848/d344fcfc-a6f2-47db-9d76-8348560ae13e)
 
-
-
 ## 4. Mengaplikasikan Keamanan Untuk Kafka Client
 
 Sekarang kita telah masuk ke Kafka client, dalam hal ini producer dan consumer. Untuk membuat komunikasi yang aman antara producer/consumer sebagai client menuju Kafka broker sebagai server dengan menggunakan SSL, kita hanya perlu mengulang perintah seperti sebelumnya. Kita hanya akan mengganti beberapa hal seperti pembuatan CA khusus untuk client serta keystore serta truststore certificate masing-masing untuk producer dan clientnya. Akan tetapi untuk tujuan percobaan kita dapat menggunakan keystore dan truststore yang sama baik untuk producer dan consumernya.
@@ -377,7 +378,7 @@ keytool -import -file client.ca.crt -keystore server.ts.p12 -storetype PKCS12 -s
 
 ```
 
-Kemudian karena producer berperan sebagai client, maka konfigurasi pun harus ditambah
+Kemudian karena producer berperan sebagai client, maka konfigurasi pun harus ditambah:
 
 ```bash
 
@@ -398,8 +399,6 @@ Jika semuanya berjalan dengan lancar kita dapat memeriksa apakah ketika kita mem
 
 berikut hasilnya jika config kita berhasil:
 ![securedataproduce](https://github.com/adtyap26/learning-kafka/assets/101618848/04efdd6b-d427-4518-a55d-04b344ebca60)
-
-
 
 ## 5. Menjalankan ACL (Access Control List)
 
@@ -426,7 +425,7 @@ Dalam konteks pembelajaran, untuk memulai pengaturan `SCRAM` ini kita tidak perl
 ```bash
 
 # Membuat koneksi antar broker menggunakan SASL_SSL
-bin/kafka-configs.sh --zookeeper localhost:2181 --zk-tls-config-file config/zookeeper-client.properties --alter --add-config 'SCRAM-SHA-256=[password=latihan]' --entity-type users --entity-name admin
+bin/kafka-configs.sh --zookeeper localhost:2181 --zk-tls-config-file config/zookeeper-client.properties --alter --add-config 'SCRAM-SHA-256=[password=latihan]' --entity-type users --entity-name administrator
 
 ```
 
@@ -441,25 +440,23 @@ security.inter.broker.protocol=SASL_SSL
 sasl.mechanism.inter.broker.protocol=SCRAM-SHA-256 (or SCRAM-SHA-512)
 sasl.enabled.mechanisms=SCRAM-SHA-256 (or SCRAM-SHA-512)
 
-listener.name.sasl_ssl.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required
-   username="admin"
+listener.name.sasl_ssl.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required \
+   username="administrator" \
    password="latihan";
 
 ```
 
 Namun sepertinya terdapat kesalahan configurasi yang saya lakukan, atau kekeliruan yang saya belum bisa mengerti penyebabnya kenapa. Karena ketika saya running kafka brokernya terdapat error `org.apache.zookeeper.KeeperException$NoAuthException: KeeperErrorCode = NoAuth for /config/users/kafka-admin`
 
-
 ![error_kafkastart](https://github.com/adtyap26/learning-kafka/assets/101618848/76f1ac4f-66f6-4d08-9d08-30b901eb9c2f)
 
-
 Dari pencarian ke dokumentasi resmi dan beberapa forum termasuk diskusi internal dengan teman, ada dua cara untuk menyelesaikannya. Pertama di dalam `zookeeper.properties` kita dapat menambahkan `skipACL=yes`. Keterangan dari hal ini masih belum sepenuhnya saya pahami. Apa yang sebenarnya terjadi di belakang layar ketika perintah tersebut dijalankan. Namun jika di lihat dari source code zookeepernya sendiri sepertinya perintah tersebut tidak akan melakukan proses checking terdapat ACL.
+
 --pic source-code acl--
 
 Hasinya ketika `kafka-server-start.sh`:
+
 ![kafka-start-after-skipacl](https://github.com/adtyap26/learning-kafka/assets/101618848/2250098e-9281-4802-9971-39dda6635f96)
-
-
 
 Cara kedua sepertinya lebih rumit lagi, karena saya memang belum ada pengalaman melakukan konfigurasi berbasis env java. Dimana dalam cara kedua kita mencoba membuat super user dan memasukkannya langsung ke dalam zookeeper. Sehingga kita dapat melakukan perubahan lewat admin privileges. Berikut linknya [zookeeper doc](https://zookeeper.apache.org/doc/r3.5.3-beta/zookeeperAdmin.html#sc_authOptions) atau artikel di medium [Overcoming Zookeeper ACLs](https://medium.com/@johny.urgiles/overcoming-zookeeper-acls-1b205cfdc301).
 
@@ -469,12 +466,18 @@ Untuk membuat user client bagi producer dan consumer saya menggunakan command in
 #Producer
 bin/kafka-configs.sh --zookeeper localhost:2181 --zk-tls-config-file config/zookeeper-client.properties  \
 --alter --add-config 'SCRAM-SHA-256=[password=latihan]' \
---entity-type users --entity-name kafka-producer
+--entity-type users --entity-name producer-one
+
+# Atau untuk client dari kafka-broker kita dapat gunakan `--bootstrap-server`
+bin/kafka-configs.sh --bootstrap-server localhost:9092 --command-config config/producer.properties  \
+--alter --add-config 'SCRAM-SHA-512=[password=latihan]' \
+--entity-type users --entity-name producer-one
+
 
 #consumer
 bin/kafka-configs.sh --zookeeper localhost:2181 --zk-tls-config-file config/zookeeper-client.properties  \
 --alter --add-config 'SCRAM-SHA-256=[password=latihan]' \
---entity-type users --entity-name kafka-consumer
+--entity-type users --entity-name consumer-one
 
 ```
 
@@ -486,8 +489,23 @@ ACL, atau daftar kontrol akses, adalah alat yang digunakan untuk mengatur dan me
 
 Dalam hal ini kita mesti memberikan izin kepada user untuk producer dan consumer untuk bisa menulis dan membaca isi dari topic.
 
+Sebelumnya kita telah membuat beberapa user yang pertama sebagai admin atau pemegang `super.user` dengan nama administrator dan yang kedua user yang bertindak sebagai producer dan consumer dengan nama producer-one dan consumer-one. Untuk producer dan consumer akan kita batasi atau atur aksesnya. Di dalam internal standar java client untuk kafka terdapat perintah `kafka-acls.sh` yang mampu mengatur hak akses para user tersebut.
+
+```bash
+# Allow producer user to write message
+bin/kafka-acls.sh --bootstrap-server localhost:9092 --command-config config/producer.properties --add --topic secureData --producer --allow-principal User:producer-one
+
+# Allow consumer user to read message
+
+bin/kafka-acls.sh --bootstrap-server localhost:9092 --command-config config/consumer.properties --add --resource-pattern-type PREFIXED --topic secureData --operation Read --allow-principal User:consumer-one
+
+
+```
+
+Hasil dari write dan read menggunakan `SASL_SSL`:
+
 - Source
 
 [Kafka: The Definitive Guide, 2nd Edition](https://www.oreilly.com/library/view/kafka-the-definitive/9781492043072/)
-
 [Kafka Security Overview](https://kafka.apache.org/documentation/#security_overview)
+[Data Engineering Mind Github](https://github.com/vinclv/data-engineering-minds-kafka/)
