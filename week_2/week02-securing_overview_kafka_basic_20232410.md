@@ -116,7 +116,8 @@ Perintah ini, yakni `openssl` digunakan oleh CA untuk menandatangani CSR yang di
 Kita dapat melakukan verifikasi certificate yang telah ditanda-tangan tersebut lewat perintah `keytool -printcert -v -file ca-signed-zookeeper.pem`
 hasilnya sebagai berikut:
 
---pic signed-certs--
+![signed-certs](https://github.com/adtyap26/learning-kafka/assets/101618848/1e1426bc-0334-4045-b821-377cefb1a69a)
+
 
 #### Import CA certificate Ke dalam KeyStore
 
@@ -452,7 +453,9 @@ Namun sepertinya terdapat kesalahan configurasi yang saya lakukan, atau kekeliru
 
 Dari pencarian ke dokumentasi resmi dan beberapa forum termasuk diskusi internal dengan teman, ada dua cara untuk menyelesaikannya. Pertama di dalam `zookeeper.properties` kita dapat menambahkan `skipACL=yes`. Keterangan dari hal ini masih belum sepenuhnya saya pahami. Apa yang sebenarnya terjadi di belakang layar ketika perintah tersebut dijalankan. Namun jika di lihat dari source code zookeepernya sendiri sepertinya perintah tersebut tidak akan melakukan proses checking terdapat ACL.
 
---pic source-code acl--
+![source-code-skipacl](https://github.com/adtyap26/learning-kafka/assets/101618848/373d9ccb-674d-4087-a881-d5d856991ddd)
+
+
 
 Hasinya ketika `kafka-server-start.sh`:
 
@@ -503,6 +506,10 @@ bin/kafka-acls.sh --bootstrap-server localhost:9092 --command-config config/cons
 ```
 
 Hasil dari write dan read menggunakan `SASL_SSL`:
+
+![write_read_SASL_SSL](https://github.com/adtyap26/learning-kafka/assets/101618848/6f3c3dd3-ba4b-4a66-838a-5b4dce39c689)
+
+
 
 - Source
 
