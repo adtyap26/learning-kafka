@@ -115,7 +115,8 @@ Langkah selanjutnya kita buat juga kafka connect untuk `gamingplayers`. Secara u
 
 Lalu jika kita lihat di `Topics >> gamingplayers >> Messages` maka kita akan melihat ada produksi event data yang masuk seperti gambar berikut:
 
-![createtopic_gaminggames](https://github.com/adtyap26/learning-kafka/assets/101618848/885d8095-981f-4fc9-b6aa-a19027bcd446)
+
+![message_topic_gamingplayers](https://github.com/adtyap26/learning-kafka/assets/101618848/cef31992-2cce-4aab-98ea-3da31742b2f8)
 
 
 
