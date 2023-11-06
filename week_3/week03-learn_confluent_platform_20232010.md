@@ -33,7 +33,7 @@ export JAVA_HOME=/home/permaditya/.sdkman/candidates/java/11.0.21-amzn/
 
 Jadi binary file dapat lebih mudah untuk dieksekusi. Perintah eksekusinya pun cukup mudah yakni hanya dengan `confluent local services start` maka semua servicenya pun akan jalan:
 
---pic confluent-local-service-start--
+![confluent-local-service-start](https://github.com/adtyap26/learning-kafka/assets/101618848/b0eb1ec6-da7d-48fa-8d68-13b1f8b91c39)
 
 **Note**
 Disaat dokumentasi ini ditulis terdapat minor update pada aplikasi confluent setelah menjalan `confluent update`
@@ -54,7 +54,9 @@ Perbedaan mendasar menggunakan confluent platform dibanding native kafka ialah t
 
 kita dapat melihatnya di `http://localhost:9021/clusters`
 
---pic control center-
+![control-center](https://github.com/adtyap26/learning-kafka/assets/101618848/1597c1e1-9c55-46c4-8d1e-723d0a735c52)
+
+
 
 2.1.1 Membuat Topic pada control-center
 
@@ -64,7 +66,10 @@ Maka saya akan mencoba membuat dua topic yakni, `gaminggames` dan `gamingplayers
 
 Hal yang perlu dilakukan pertama ialah cukup membuka `controlcenter.cluster` >> `Topics` >> `Add a topic` kemudian isi topic name dengan `gaminggames` sebagai topic pertama dan `gamingplayers` sebagai topic keduanya.
 
---pic createtopic--
+![createtopic_gaminggames](https://github.com/adtyap26/learning-kafka/assets/101618848/67ae742d-46a0-4c1e-8c61-cc8b460a0f79)
+![createtopic_gamingpalyers](https://github.com/adtyap26/learning-kafka/assets/101618848/07d52cad-26e0-4a0a-9719-a3b900840e7c)
+
+
 
 ## Langkah 3 membuat connector dengan kafka connect
 
@@ -100,15 +105,19 @@ General section:
 
 Maka kita dapat melihat schema yang dibuat oleh connector tersebut:
 
---pic scemma addconnector--
+![schemma_add_connector](https://github.com/adtyap26/learning-kafka/assets/101618848/792e8c18-3b06-4b95-832e-434bb98cf4df)
+
 
 Langkah selanjutnya kita buat juga kafka connect untuk `gamingplayers`. Secara umum konfigurasinya sama tinggal di quickstartnya saja kita ganti dengan `gaming_players`
 
---pic addconnector running gaminggames--
+![addconnector_gaminggames](https://github.com/adtyap26/learning-kafka/assets/101618848/0c391b52-8f1c-4801-aba5-f36d22ab0b01)
+
 
 Lalu jika kita lihat di `Topics >> gamingplayers >> Messages` maka kita akan melihat ada produksi event data yang masuk seperti gambar berikut:
 
---pic messages topic gamingplayers--
+![createtopic_gaminggames](https://github.com/adtyap26/learning-kafka/assets/101618848/885d8095-981f-4fc9-b6aa-a19027bcd446)
+
+
 
 Namun hubungan koneksi di atas masih menggunakan unsecure connection. Kalau kita lihat di dokumentasi resminya ada beberapa service yang bisa kita optimalkan keamanannya:
 
@@ -126,8 +135,9 @@ Untuk itu kita akan setup keamanannya menggunakan SASL_SSL, sebagaimana yang tel
 Setelah kita membuat certificate yang dibutuhkan: `zookeeper` dan `kafka` termasuk klien dari kafka seperti producer dan consumer, serta kita juga meski mengamankan `schema registry`, `ksqlDB` dan `control center`.
 
  
+![local-service-SSl](https://github.com/adtyap26/learning-kafka/assets/101618848/fe1bf881-d26c-4828-841c-3f13ea4ceb2b)
 
---pic confluent local start ssl-
+
 
 4.1 Membuat Kafka Client Untuk Produce dan Consume Data Menggunakan Avro Schema
 
