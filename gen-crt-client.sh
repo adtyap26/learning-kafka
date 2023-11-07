@@ -6,7 +6,6 @@ CA_P12="client.ca.p12"
 CA_CRT_NAME="client.ca.crt"
 STOREPASS="latihan"
 KEYPASS="latihan"
-ALIAS_CA_CLIENT="clientCA"
 ALIAS_CA_SERVER="server"
 ALIAS_KEYSTORE="client"
 KEYSTORE_NAME="client.ks.p12"
@@ -18,7 +17,7 @@ CRT_NAME="client.crt"
 # Prompt the user for the paths to server.ca.crt and client.ca.crt
 read -p "Enter the path to the server CA certificate (server.ca.crt): " server_ca_path
 read -p "Enter the path to the server trustore (server.ts.p12): " server_ts_path
-
+read -p "Enter alias for CA Client(this will be imported to Truststore Server): " ALIAS_CA_CLIENT
 
 # Import server.ca.crt ke klien trustore
 keytool -import -file "$server_ca_path" -keystore "$TRUSTSTORE_NAME" \
