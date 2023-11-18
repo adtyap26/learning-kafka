@@ -352,7 +352,10 @@ Jika seluruh service telah menggunakan SASL, terenkripsi SSL/TLS dan telah mengg
 
 
 
-https://github.com/adtyap26/learning-kafka/assets/101618848/0cd0d484-183b-41c9-acb9-c79ac35357f5
+
+https://github.com/adtyap26/learning-kafka/assets/101618848/15c5a3fe-35a3-4bda-a086-c10d42a22537
+
+
 
 
 Selanjutnya kita dapat mengikuti tutorial dalam minggu sebelumnya untuk running confluent control-center.
