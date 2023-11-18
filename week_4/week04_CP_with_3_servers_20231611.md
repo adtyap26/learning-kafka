@@ -362,8 +362,7 @@ Selanjutnya kita dapat mengikuti tutorial dalam minggu sebelumnya untuk running 
 
 
 
-![running_topics](https://github.com/adtyap26/learning-kafka/assets/101618848/05e4835d-e606-49eb-a5ce-e1ec349b3674)
-
+![photo_2023-11-18_10-54-58](https://github.com/adtyap26/learning-kafka/assets/101618848/1ce4b422-3415-4458-ac4e-fec7b016aa6f)
 
 
 
