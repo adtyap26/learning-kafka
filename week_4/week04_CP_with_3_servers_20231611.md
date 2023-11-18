@@ -10,7 +10,9 @@ Sebelum memulai melakukan instalasi CP kita akan menyiapkan keamanan untuk ke ti
 
 Setelah login ke sistem untuk pertama kali dengan menggunakan akun root, langkah awal yang dapa kita gunakan ialah malakukan update pada sistem agar repositori yang kita gunakan dapat melakukan akses ke aplikasi yang baru sehingga mengurangi celah keamanan pada obsolete sistem. Sistem operasi yang kita gunakan merupakan RHEL based. Maka cara melakukan update sistemnya menggunakan `dnf update`, kita tentunya juga masih dapat menggunakan `yum update` walaupun sebenarnya yum atau The Yellowdog Updater Modified ini telah deprecated namun lewat berbagai alasan seperti faktor kebiasaan dan masih banyak sumber informasi mengenai RHEL based OS yang menyarankan penggunaan yum, maka yum masih exist, walaupun sebenarnya kalau kita lihat di `/usr/bin/yum` perintah ini hanyalah symbolic link ke perintah `dnf`.
 
---pic yum--
+![update_server_yum](https://github.com/adtyap26/learning-kafka/assets/101618848/f9884cf7-37e1-484a-9b1d-1642fd22da9f)
+
+
 
 #### 1.2 Add user dan setup env
 
@@ -273,7 +275,8 @@ Untuk konfigurasi systemd pun tidak jauh berbeda dengan [week 01 Kafka dasar](ht
 
 Pada intinya keseluruhan service yang perlu running untuk membuat control-center dapa berjalan dengan minimal setup adalah sebagai berikut:
 
---pic of list systemd-
+![list-systemd](https://github.com/adtyap26/learning-kafka/assets/101618848/303984f0-e82a-4c66-94ed-8808366ad54b)
+
 
 Karena akan cukup merepotkan untuk untuk terus mengulang perintah dalam `systemctl` saya menggunakan beberapa cara antara lain:
 
@@ -281,7 +284,8 @@ Karena akan cukup merepotkan untuk untuk terus mengulang perintah dalam `systemc
 
 2. Menggunakan alias. Perintah systemctl cukup panjang, dengan alias kita dapat mempersingkatnya
 
---pic alias--
+![alias-systemctl](https://github.com/adtyap26/learning-kafka/assets/101618848/46c4302d-0d91-4858-a320-98b4da6aa1a8)
+
 
 3. Membuat shell script untuk auto start dan auto stop keseluruhan service CP
 
@@ -346,12 +350,16 @@ done
 
 Jika seluruh service telah menggunakan SASL, terenkripsi SSL/TLS dan telah menggunakan systemd maka kita hanya perlu memulai seluruh system service tersebut. Kita akan gunakan script yang telah dibuat sebelumnya:
 
---vid script run--
+
+
+https://github.com/adtyap26/learning-kafka/assets/101618848/0cd0d484-183b-41c9-acb9-c79ac35357f5
+
 
 Selanjutnya kita dapat mengikuti tutorial dalam minggu sebelumnya untuk running confluent control-center.
 
---pic-running-topic--
 
+
+![running_topics](https://github.com/adtyap26/learning-kafka/assets/101618848/05e4835d-e606-49eb-a5ce-e1ec349b3674)
 
 
 
