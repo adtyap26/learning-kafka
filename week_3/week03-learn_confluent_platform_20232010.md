@@ -228,11 +228,13 @@ func main() {
 
 Di dalam tutorial kita membuat topik dengan nama `transactions` dan dengan melakukan load config dari [Payment.avsc](https://github.com/confluentinc/examples/blob/7.5.2-post/clients/avro/src/main/resources/avro/io/confluent/examples/clients/basicavro/Payment.avsc) kita mulai memproduksi pesan yang akan tampil pada controlcenter.
 
---produce-avro--
+![produce-topic-avro](https://github.com/adtyap26/learning-kafka/assets/101618848/24e1db31-5fc7-4de8-a995-6e9ffd378bc4)
+
 
 Berikut hasilnya di control-center:
 
---pic-control-center--
+![get_topic-avro-control-center](https://github.com/adtyap26/learning-kafka/assets/101618848/7e001883-d2fd-4b8f-a4e9-ad8948ed60e9)
+
 
 Selanjutnya kita juga perlu membuat client untuk consume data yang telah kita buat di atas. Tidak ada memodifikasi yang signifikan yang saya lakukan hanya mengubah `c.Close()` pada bagian akhir karena LSP dalam kode editor saya menjelaskan bahwa bagian line tersebut tidak akan sampai untuk tereksekusi karena looping di line sebelumnya. Lalu saya ubah dengan menggunakan `defer` menjadi `defer c.Close()`.
 
@@ -289,7 +291,7 @@ func main() {
 
 Hasil dari consumernya sebagai berikut:
 
---consumer-avro--
+![consumer-avro-read-message](https://github.com/adtyap26/learning-kafka/assets/101618848/1f43017d-acc1-4205-90e8-94fec31bcae9)
 
 4.1 Memproduksi Data Menggunakan Kafka REST
 
