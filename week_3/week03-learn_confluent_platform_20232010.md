@@ -56,8 +56,6 @@ kita dapat melihatnya di `http://localhost:9021/clusters`
 
 ![control-center](https://github.com/adtyap26/learning-kafka/assets/101618848/1597c1e1-9c55-46c4-8d1e-723d0a735c52)
 
-
-
 2.1.1 Membuat Topic pada control-center
 
 Di dalam tutorial, kita diminta untuk membuat dua topik yakni `pageviews` dan `users`. Namun saya akan mencoba membuat topic dengan nama yang berbeda, karena ternyata dalam tutorialnya sudah dibuat mockup data yang dapat di'generate' secara otomatis, berikut sumbernya [kafka-connect-datagen](https://github.com/confluentinc/kafka-connect-datagen#configuration). Di dalam salah satu konfigurasinya terdapat sebuah namespace `gaming` yang terdiri dari `gaming_games.avro` `gaming_player_activity.avro` dan `gaming_player.avro`.
@@ -68,8 +66,6 @@ Hal yang perlu dilakukan pertama ialah cukup membuka `controlcenter.cluster` >> 
 
 ![createtopic_gaminggames](https://github.com/adtyap26/learning-kafka/assets/101618848/67ae742d-46a0-4c1e-8c61-cc8b460a0f79)
 ![createtopic_gamingpalyers](https://github.com/adtyap26/learning-kafka/assets/101618848/07d52cad-26e0-4a0a-9719-a3b900840e7c)
-
-
 
 ## Langkah 3 membuat connector dengan kafka connect
 
@@ -107,18 +103,13 @@ Maka kita dapat melihat schema yang dibuat oleh connector tersebut:
 
 ![schemma_add_connector](https://github.com/adtyap26/learning-kafka/assets/101618848/792e8c18-3b06-4b95-832e-434bb98cf4df)
 
-
 Langkah selanjutnya kita buat juga kafka connect untuk `gamingplayers`. Secara umum konfigurasinya sama tinggal di quickstartnya saja kita ganti dengan `gaming_players`
 
 ![addconnector_gaminggames](https://github.com/adtyap26/learning-kafka/assets/101618848/0c391b52-8f1c-4801-aba5-f36d22ab0b01)
 
-
 Lalu jika kita lihat di `Topics >> gamingplayers >> Messages` maka kita akan melihat ada produksi event data yang masuk seperti gambar berikut:
 
-
 ![message_topic_gamingplayers](https://github.com/adtyap26/learning-kafka/assets/101618848/cef31992-2cce-4aab-98ea-3da31742b2f8)
-
-
 
 Namun hubungan koneksi di atas masih menggunakan unsecure connection. Kalau kita lihat di dokumentasi resminya ada beberapa service yang bisa kita optimalkan keamanannya:
 
@@ -135,12 +126,170 @@ Untuk itu kita akan setup keamanannya menggunakan SASL_SSL, sebagaimana yang tel
 
 Setelah kita membuat certificate yang dibutuhkan: `zookeeper` dan `kafka` termasuk klien dari kafka seperti producer dan consumer, serta kita juga meski mengamankan `schema registry`, `ksqlDB` dan `control center`.
 
- 
 ![local-service-SSl](https://github.com/adtyap26/learning-kafka/assets/101618848/fe1bf881-d26c-4828-841c-3f13ea4ceb2b)
 
-
-
 4.1 Membuat Kafka Client Untuk Produce dan Consume Data Menggunakan Avro Schema
+
+Untuk membuat client yang dapat produce dan consume data dan menampilkannya di `controlcenter` maka kita hanya perlu mengikut tutorial di dokumentasi resminya [On-Premises Schema Registry Tutorial](https://docs.confluent.io/platform/current/schema-registry/schema_registry_onprem_tutorial.html#). Namun karena tutorial tersebut menggunakan java sebagai client producer dan consumernya, sedang kemampuan bahasa pemograman java saya nyaris menyentuh angka 0 maka saya putuskan untuk mencoba membuat client nya di bahasa yang saya sedikit lebih mengerti yaitu Go.
+
+Setelah mencari contoh dari penggunaan client go untuk kasus spesifik yang dicontohkan dalam tutorial saya menemukan satu contoh code yang mudah dibaca dan dipahami [Avro Usage Examples](https://github.com/riferrei/srclient/blob/master/EXAMPLES_AVRO.md).
+
+Dari contoh yang ada dalam github tersebut saya memodifikasinya menjadi seperti ini:
+
+```go
+
+import (
+	"encoding/binary"
+	"encoding/json"
+	"fmt"
+	"os"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/riferrei/srclient"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+)
+
+type Payment struct {
+	ID     string  `json:"id"`
+	Amount float64 `json:"amount"`
+}
+
+func main() {
+	topic := "transactions"
+
+	// 1) Create the producer as you would normally do using Confluent's Go client
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
+	if err != nil {
+		panic(err)
+	}
+	defer p.Close()
+
+	go func() {
+		for event := range p.Events() {
+			switch ev := event.(type) {
+			case *kafka.Message:
+				message := ev
+				if ev.TopicPartition.Error != nil {
+					fmt.Printf("Error delivering the message '%s'\n", message.Key)
+				} else {
+					fmt.Printf("Message '%s' delivered successfully!\n", message.Key)
+				}
+			}
+		}
+	}()
+
+	// 2) Fetch the latest version of the schema, or create a new one if it is the first
+	schemaRegistryClient := srclient.CreateSchemaRegistryClient("http://localhost:8081")
+	schema, err := schemaRegistryClient.GetLatestSchema(topic)
+	if schema == nil {
+		schemaBytes, _ := os.ReadFile("Payment.avsc")
+		schema, err = schemaRegistryClient.CreateSchema(topic, string(schemaBytes), srclient.Avro)
+		if err != nil {
+			panic(fmt.Sprintf("Error creating the schema %s", err))
+		}
+	}
+	schemaIDBytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(schemaIDBytes, uint32(schema.ID()))
+
+	// 3) Serialize the record using the schema provided by the client,
+	// making sure to include the schema id as part of the record.
+	// newPayment := Payment{ID: "231", Amount: 50.00} # You can do hardcode like this or loop like the ones below.
+
+	for i := 0; i < 5; i++ { // Adjust the loop as needed
+		newPayment := Payment{ID: fmt.Sprintf("%d", i+1), Amount: float64((i + 1) * 10)}
+		value, _ := json.Marshal(newPayment)
+		native, _, _ := schema.Codec().NativeFromTextual(value)
+		valueBytes, _ := schema.Codec().BinaryFromNative(nil, native)
+
+		var recordValue []byte
+		recordValue = append(recordValue, byte(0))
+		recordValue = append(recordValue, schemaIDBytes...)
+		recordValue = append(recordValue, valueBytes...)
+
+		key, _ := uuid.NewUUID()
+
+		err = p.Produce(&kafka.Message{
+			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+			Key:            []byte(key.String()),
+			Value:          recordValue,
+		}, nil)
+		if err != nil {
+			fmt.Printf("Error producing message: %v\n", err)
+		}
+
+		time.Sleep(1 * time.Second) // Sleep for some time between producing messages
+	}
+
+	p.Flush(15 * 1000)
+}
+
+```
+
+Di dalam tutorial kita membuat topik dengan nama `transactions` dan dengan melakukan load config dari [Payment.avsc](https://github.com/confluentinc/examples/blob/7.5.2-post/clients/avro/src/main/resources/avro/io/confluent/examples/clients/basicavro/Payment.avsc) kita mulai memproduksi pesan yang akan tampil pada controlcenter.
+
+--produce-avro--
+
+Berikut hasilnya di control-center:
+
+--pic-control-center--
+
+Selanjutnya kita juga perlu membuat client untuk consume data yang telah kita buat di atas. Tidak ada memodifikasi yang signifikan yang saya lakukan hanya mengubah `c.Close()` pada bagian akhir karena LSP dalam kode editor saya menjelaskan bahwa bagian line tersebut tidak akan sampai untuk tereksekusi karena looping di line sebelumnya. Lalu saya ubah dengan menggunakan `defer` menjadi `defer c.Close()`.
+
+```go
+
+import (
+	"encoding/binary"
+	"fmt"
+
+	"github.com/riferrei/srclient"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+)
+
+func main() {
+	// 1) Create the consumer as you would
+	// normally do using Confluent's Go client
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers": "localhost",
+		"group.id":          "myGroup",
+		"auto.offset.reset": "earliest",
+	})
+	if err != nil {
+		panic(err)
+	}
+	defer c.Close()
+
+	c.SubscribeTopics([]string{"transactions"}, nil)
+
+	// 2) Create a instance of the client to retrieve the schemas for each message
+	schemaRegistryClient := srclient.CreateSchemaRegistryClient("http://localhost:8081")
+
+	for {
+		msg, err := c.ReadMessage(-1)
+		if err == nil {
+			// 3) Recover the schema id from the message and use the
+			// client to retrieve the schema from Schema Registry.
+			// Then use it to deserialize the record accordingly.
+			schemaID := binary.BigEndian.Uint32(msg.Value[1:5])
+			schema, err := schemaRegistryClient.GetSchema(int(schemaID))
+			if err != nil {
+				panic(fmt.Sprintf("Error getting the schema with id '%d' %s", schemaID, err))
+			}
+			native, _, _ := schema.Codec().NativeFromBinary(msg.Value[5:])
+			value, _ := schema.Codec().TextualFromNative(nil, native)
+			fmt.Printf("Here is the message %s\n", string(value))
+		} else {
+			fmt.Printf("Error consuming the message: %v (%v)\n", err, msg)
+		}
+	}
+}
+
+
+```
+
+Hasil dari consumernya sebagai berikut:
+
+--consumer-avro--
 
 4.1 Memproduksi Data Menggunakan Kafka REST
 
