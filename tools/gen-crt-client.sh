@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Variables that can be changed
 STOREPASS="latihan"
 KEYPASS="latihan"
 ALIAS_CA="ca"

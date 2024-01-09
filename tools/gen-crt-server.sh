@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Variable yang dapat kita ubah
 CA_NAME="BrokerCA"
 CA_P12="server.ca.p12"
 CA_CRT_NAME="server.ca.crt"
